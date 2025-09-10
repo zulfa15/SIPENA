@@ -105,12 +105,13 @@
 
   <div class="login-container">
     <h2>Masuk ke akunmu</h2>
-    <form action="#" method="POST">
+    <form action="/proseslogin" method="POST">
+        @csrf
       <div class="form-group">
-        <input type="text" class="form-control" placeholder="Username">
+        <input type="text" name="nik" class="form-control" id="nik" placeholder="NIK">
       </div>
       <div class="form-group">
-        <input type="password" class="form-control" placeholder="Password">
+        <input type="password" name='password' class="form-control" id="password" placeholder="Password">
       </div>
       <div class="form-links">
         <a href="#">Lupa Password</a>
