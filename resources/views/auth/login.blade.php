@@ -105,6 +105,14 @@
 
   <div class="login-container">
     <h2>Masuk ke akunmu</h2>
+    @php
+    $messagewarning = Session::get('warning');
+    @endphp
+    @if (Session::get('warning'))
+    <div class="alert-outline-warning">
+        {{ $messagewarning }}
+    </div>
+    @endif
     <form action="/proseslogin" method="POST">
         @csrf
       <div class="form-group">

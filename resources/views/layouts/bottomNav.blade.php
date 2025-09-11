@@ -52,9 +52,11 @@
 
 <div class="appBottomMenu">
     <!-- Home -->
-    <a href="#" class="item active">
+    <a href="/dashboard" class="item" {{ request()->is('dashboard') ? 'active' : ''  }}>
         <div class="col">
-            <img src="https://s3-alpha-sig.figma.com/img/12a8/0cc4/88f877f...">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M4 19v-9q0-.475.213-.9t.587-.7l6-4.5q.525-.4 1.2-.4t1.2.4l6 4.5q.375.275.588.7T20 10v9q0 .825-.588 1.413T18 21h-3q-.425 0-.712-.288T14 20v-5q0-.425-.288-.712T13 14h-2q-.425 0-.712.288T10 15v5q0 .425-.288.713T9 21H6q-.825 0-1.412-.587T4 19"/>
+            </svg>
             <strong>Beranda</strong>
         </div>
     </a>
@@ -68,7 +70,7 @@
     </a>
 
     <!-- Kamera -->
-    <a href="#" class="item">
+    <a href="/presensi/create" class="item">
         <div class="col">
             <div class="camera-button">
                 <img src="https://s3-alpha-sig.figma.com/img/fda2/7be2/93f...">
