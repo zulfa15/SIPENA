@@ -1,5 +1,5 @@
 @extends('layouts.presensi')
-@section(('header'))
+@section('header')
     <!-- App Header -->
     <div class="appHeader bg-primary text-light">
         <div class="left">
@@ -35,7 +35,10 @@
 </div>
 <div class="row">
     <div class="col">
-         <button id="takeabsen" class="btn btn-primary btn-block">Absen Masuk</button>
+         <button id="takeabsen" class="btn btn-primary btn-block">
+            <ion-icon name="camera-outline"></ion-icon>
+            Absen Masuk</button>
+
     </div>
 </div>
 @endsection
