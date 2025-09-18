@@ -43,9 +43,10 @@
     @include('layouts.script')
 
 
-
+    @stack('myscript')
 
   
 </body>
 
-</html>
+</html>\   
+    
