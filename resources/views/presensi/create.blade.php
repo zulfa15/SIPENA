@@ -62,10 +62,21 @@
             <div id="map"></div>
         </div>
     </div>
+
+<audio id="notifikasi_in">
+    <source src="{{ asset('assets/sound/notifikasi_in.mp3') }}" type="audio/mpeg">
+</audio>
+<audio id="notifikasi_out">
+    <source src="{{ asset('assets/sound/notifikasi_out.mp3') }}" type="audio/mpeg">
+</audio>
+
 @endsection
 
 @push('myscript')
 <script>
+
+    var notifikasi_in = document.getElementById('notifikasi_in')
+    var notifikasi_out = document.getElementById('notifikasi_out')
     // --- Setting webcam ---
     Webcam.set({
         height: 480,
@@ -128,32 +139,39 @@
                 },
                 cache: false,
                 success: function (respond) {
-                    // ambil message lalu split pakai |
-                    let parts = respond.message.split('|');
-                    // parts[0] = status
-                    // parts[1] = pesan
-                    // parts[2] = In/Out
+                // ambil message lalu split pakai |
+                let parts = respond.message.split('|');
+                // parts[0] = status
+                // parts[1] = pesan
+                // parts[2] = In/Out
 
-                    if (respond.status === 'success') {
-                        Swal.fire({
-                            title: 'Berhasil!',
-                            text: parts[1] + " (" + parts[2] + ")",
-                            icon: 'success',
-                            confirmButtonText: 'OK'
-                        });
-
-                        setTimeout(function () {
-                            window.location.href = '/dashboard';
-                        }, 3000);
+                if (respond.status === 'success') {
+                    if (parts[2] && parts[2].toLowerCase() === "in") {
+                        notifikasi_in.load();
+                        notifikasi_in.play();
                     } else {
-                        Swal.fire({
-                            title: 'Error!',
-                            text: parts[1],
-                            icon: 'error',
-                            confirmButtonText: 'OK'
-                        });
+                        notifikasi_out.play();
                     }
-                },
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: parts[1] + " (" + parts[2] + ")",
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    });
+
+                    setTimeout(function () {
+                        window.location.href = '/dashboard';
+                    }, 3000);
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: parts[1],
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+
+            },
 
                 error: function (xhr) {
                     console.log(xhr.responseText);
