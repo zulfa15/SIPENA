@@ -58,72 +58,100 @@
 @endsection
 
 @push('myscript')
-    <script>
-        // Setting webcam
-        Webcam.set({
-            height: 480,
-            width: 640,
-            image_format: 'jpeg',
-            jpeg_quality: 80
-        });
-        Webcam.attach('.webcam-capture');
+<script>
+    // --- Setting webcam ---
+    Webcam.set({
+        height: 480,
+        width: 640,
+        image_format: 'jpeg',
+        jpeg_quality: 80
+    });
+    Webcam.attach('.webcam-capture');
 
-        // Ambil lokasi
-        const lokasi = document.getElementById('lokasi');
+    // --- Ambil lokasi ---
+    const lokasiInput = document.getElementById('lokasi');
 
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
-        } else {
-            lokasi.value = "Geolocation tidak didukung browser ini";
-        }
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+    } else {
+        lokasiInput.value = "Geolocation tidak didukung browser ini";
+    }
 
-        function successCallback(position) {
-            // ambil latitude & longitude
-            lokasi.value = position.coords.latitude + "," + position.coords.longitude;
+    function successCallback(position) {
+        // simpan latitude & longitude
+        lokasiInput.value = position.coords.latitude + "," + position.coords.longitude;
 
-            // tampilkan peta
-            const map = L.map('map').setView([position.coords.latitude, position.coords.longitude], 15);
+        // tampilkan peta
+        const map = L.map('map').setView([position.coords.latitude, position.coords.longitude], 15);
 
-            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            }).addTo(map);
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
 
-            // marker
-            L.marker([position.coords.latitude, position.coords.longitude]).addTo(map);
+        // marker
+        L.marker([position.coords.latitude, position.coords.longitude]).addTo(map);
 
-            // lingkaran radius
-            L.circle([position.coords.latitude, position.coords.longitude], {
-                color: 'red',
-                fillColor: '#f03',
-                fillOpacity: 0.5,
-                radius: 100
-            }).addTo(map);
-        }
+        // lingkaran radius
+        L.circle([position.coords.latitude, position.coords.longitude], {
+            color: 'red',
+            fillColor: '#f03',
+            fillOpacity: 0.5,
+            radius: 100
+        }).addTo(map);
+    }
 
-        function errorCallback(error) {
-            lokasi.value = "Tidak bisa mendapatkan lokasi: " + error.message;
-        }
+    function errorCallback(error) {
+        lokasiInput.value = "Tidak bisa mendapatkan lokasi: " + error.message;
+    }
 
-        $("#takeabsen").click(function (e) {
-            Webcam.snap(function(uri) {
-                image = uri;
-            });
-            var lokasi = $('#lokasi').val();
+    // --- Tombol absen ---
+    $("#takeabsen").click(function (e) {
+        Webcam.snap(function (uri) {
+            let image = uri;
+            let lokasi = $('#lokasi').val();
+
             $.ajax({
-            type: 'POST',
-            url: '/presensi/store',
-            data:{
-                _token: "{{ csrf_token }}",
-                image: image,
-                lokasi: lokasi
-            }
-            cache: false 
-            success: function(respond) {
-
-            }
+                type: 'POST',
+                url: '/presensi/store',
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    image: image,
+                    lokasi: lokasi
+                },
+                cache: false,
+                success: function (respond) {
+                    // jika controller return response()->json(['status'=>'success'])
+                    if (respond.status === 'success') {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: 'Terimakasih Selamat Bekerja',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        });
+                        setTimeout(function(){
+                            window.location.href = '/dashboard';
+                        }, 3000);
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Maaf Gagal Absen, Silakan Hubungi IT',
+                            icon: 'error'
+                        
+                        })
+                        setTimeout("location.href='/dashboard'", 3000);
+                    }
+                },
+                error: function (xhr) {
+                    console.log(xhr.responseText);
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Terjadi kesalahan sistem!',
+                        icon: 'error'
+                    });
+                }
             });
-            
         });
-    </script>
+    });
+</script>
 @endpush
