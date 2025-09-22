@@ -40,13 +40,20 @@
             <div class="webcam-capture"></div>
         </div>
     </div>
-
+    
     <div class="row">
         <div class="col">
-            <button id="takeabsen" class="btn btn-primary btn-block">
-                <ion-icon name="camera-outline"></ion-icon>
-                Absen Masuk
-            </button>
+            @if ($cek > 0)
+                <button id="takeabsen" class="btn btn-danger btn-block">
+                    <ion-icon name="camera-outline"></ion-icon>
+                    Absen Pulang
+                </button>
+            @else
+                <button id="takeabsen" class="btn btn-primary btn-block">
+                    <ion-icon name="camera-outline"></ion-icon>
+                    Absen Masuk
+                </button>
+            @endif
         </div>
     </div>
 
@@ -121,27 +128,33 @@
                 },
                 cache: false,
                 success: function (respond) {
-                    // jika controller return response()->json(['status'=>'success'])
+                    // ambil message lalu split pakai |
+                    let parts = respond.message.split('|');
+                    // parts[0] = status
+                    // parts[1] = pesan
+                    // parts[2] = In/Out
+
                     if (respond.status === 'success') {
                         Swal.fire({
                             title: 'Berhasil!',
-                            text: 'Terimakasih Selamat Bekerja',
+                            text: parts[1] + " (" + parts[2] + ")",
                             icon: 'success',
                             confirmButtonText: 'OK'
                         });
-                        setTimeout(function(){
+
+                        setTimeout(function () {
                             window.location.href = '/dashboard';
                         }, 3000);
                     } else {
                         Swal.fire({
                             title: 'Error!',
-                            text: 'Maaf Gagal Absen, Silakan Hubungi IT',
-                            icon: 'error'
-                        
-                        })
-                        setTimeout("location.href='/dashboard'", 3000);
+                            text: parts[1],
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
                     }
                 },
+
                 error: function (xhr) {
                     console.log(xhr.responseText);
                     Swal.fire({
