@@ -12,9 +12,7 @@
         <div class="right"></div>
     </div>
     <!-- * App Header -->
-
-    <style>
-        /* Styling webcam */
+ <style>
         .webcam-capture,
         .webcam-capture video {
             display: inline-block;
@@ -29,8 +27,8 @@
         }
     </style>
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 @endsection
 
 @section('content')
@@ -63,21 +61,29 @@
         </div>
     </div>
 
-<audio id="notifikasi_in">
-    <source src="{{ asset('assets/sound/notifikasi_in.mp3') }}" type="audio/mpeg">
-</audio>
-<audio id="notifikasi_out">
-    <source src="{{ asset('assets/sound/notifikasi_out.mp3') }}" type="audio/mpeg">
-</audio>
-
+    <audio id="notifikasi_in">
+        <source src="{{ asset('assets/sound/notifikasi_in.mp3') }}" type="audio/mpeg">
+    </audio>
+    <audio id="notifikasi_out">
+        <source src="{{ asset('assets/sound/notifikasi_out.mp3') }}" type="audio/mpeg">
+    </audio>
+    <audio id="radius_sound">
+        <source src="{{ asset('assets/sound/radius.mp3') }}" type="audio/mpeg">
+    </audio>
 @endsection
 
 @push('myscript')
 <script>
+    var notifikasi_in  = document.getElementById('notifikasi_in');
+    var notifikasi_out = document.getElementById('notifikasi_out');
+    var radius_sound   = document.getElementById('radius_sound');
 
-    var notifikasi_in = document.getElementById('notifikasi_in')
-    var notifikasi_out = document.getElementById('notifikasi_out')
-    // --- Setting webcam ---
+    // ==== KOORDINAT KANTOR (ubah sesuai lokasi kantor) ====
+    const latKantor = -7.595928021196008; // ganti latitude kantor
+    const lngKantor = 110.94004006560145; // ganti longitude kantor (benar)
+    const radiusKantor = 20; // meter
+
+
     Webcam.set({
         height: 480,
         width: 640,
@@ -85,9 +91,7 @@
         jpeg_quality: 80
     });
     Webcam.attach('.webcam-capture');
-
-    // --- Ambil lokasi ---
-    const lokasiInput = document.getElementById('lokasi');
+  const lokasiInput = document.getElementById('lokasi');
 
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
@@ -96,35 +100,34 @@
     }
 
     function successCallback(position) {
-        // simpan latitude & longitude
-        lokasiInput.value = position.coords.latitude + "," + position.coords.longitude;
+    const latUser = position.coords.latitude;
+    const lngUser = position.coords.longitude;
+    lokasiInput.value = latUser + "," + lngUser;
 
-        // tampilkan peta
-        const map = L.map('map').setView([position.coords.latitude, position.coords.longitude], 15);
+    var map = L.map('map').setView([position.coords.latitude, position.coords.longitude], 15);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
 
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        }).addTo(map);
+    // Marker posisi user/device
+    var marker = L.marker([position.coords.latitude, position.coords.longitude]).addTo(map);
 
-        // marker
-        L.marker([position.coords.latitude, position.coords.longitude]).addTo(map);
+    // Circle radius kantor (tetap di pusat kantor)
+    L.circle([latKantor, lngKantor], {
+        color: 'red',
+        fillColor: '#f03',
+        fillOpacity: 0.5,
+        radius: 800
+    }).addTo(map).bindPopup("Radius Kantor");
+}
 
-        // lingkaran radius
-        L.circle([position.coords.latitude, position.coords.longitude], {
-            color: 'red',
-            fillColor: '#f03',
-            fillOpacity: 0.5,
-            radius: 100
-        }).addTo(map);
-    }
 
     function errorCallback(error) {
         lokasiInput.value = "Tidak bisa mendapatkan lokasi: " + error.message;
     }
 
-    // --- Tombol absen ---
-    $("#takeabsen").click(function (e) {
+    $("#takeabsen").click(function () {
         Webcam.snap(function (uri) {
             let image = uri;
             let lokasi = $('#lokasi').val();
@@ -139,40 +142,42 @@
                 },
                 cache: false,
                 success: function (respond) {
-                // ambil message lalu split pakai |
-                let parts = respond.message.split('|');
-                // parts[0] = status
-                // parts[1] = pesan
-                // parts[2] = In/Out
+                    let parts = respond.message.split('|');
 
-                if (respond.status === 'success') {
-                    if (parts[2] && parts[2].toLowerCase() === "in") {
-                        notifikasi_in.load();
-                        notifikasi_in.play();
+                    if (respond.status === 'success') {
+                        // Berhasil (notifikasi_in = absen masuk, notifikasi_out = absen pulang)
+                        if (parts[2] && parts[2].toLowerCase() === "in") {
+                            notifikasi_in.load();
+                            notifikasi_in.play();
+                        } else {
+                            notifikasi_out.load();
+                            notifikasi_out.play();
+                        }
+
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: parts[1],
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        });
+
+                        setTimeout(function () {
+                            window.location.href = '/dashboard';
+                        }, 3000);
+
                     } else {
-                        notifikasi_out.play();
+                        // Diluar radius
+                        radius_sound.load();
+                        radius_sound.play();
+
+                        Swal.fire({
+                            title: 'Gagal!',
+                            text: parts[1],
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
                     }
-                    Swal.fire({
-                        title: 'Berhasil!',
-                        text: parts[1] + " (" + parts[2] + ")",
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    });
-
-                    setTimeout(function () {
-                        window.location.href = '/dashboard';
-                    }, 3000);
-                } else {
-                    Swal.fire({
-                        title: 'Error!',
-                        text: parts[1],
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    });
-                }
-
-            },
-
+                },
                 error: function (xhr) {
                     console.log(xhr.responseText);
                     Swal.fire({

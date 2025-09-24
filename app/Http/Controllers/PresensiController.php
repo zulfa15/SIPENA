@@ -13,12 +13,7 @@ class PresensiController extends Controller
     {
         $hariini = date("Y-m-d");
         $nik = Auth::guard('karyawan')->user()->nik;
-
-        // Pastikan nama tabel benar
-        $cek = DB::table('presensi')
-            ->where('tgl_presensi', $hariini)
-            ->where('nik', $nik)
-            ->count();
+        $cek = DB::table('presensi')->where('tgl_presensi', $hariini)->where('nik', $nik)->count();
 
         return view('presensi.create', compact('cek'));
     }
@@ -28,13 +23,38 @@ class PresensiController extends Controller
         $nik          = Auth::guard('karyawan')->user()->nik;
         $tgl_presensi = date("Y-m-d");
         $jam          = date("H:i:s");
-        $lokasi       = $request->lokasi;
-        $image        = $request->image;
 
-        $folderPath = 'public/uploads/absensi/';
-        $formatName = $nik . "-" . $tgl_presensi;
-        $fileName   = $formatName . ".png";
-        $file       = $folderPath . $fileName;
+        // Koordinat kantor
+        $latitudekantor  = -7.595928021196008; 
+        $longitudekantor =  110.94004006560145;
+
+        // Lokasi user
+        $lokasi     = $request->lokasi; // contoh: "-7.59,110.93"
+        $lokasiuser = explode(",", $lokasi);
+
+        $latitudeuser  = isset($lokasiuser[0]) ? $lokasiuser[0] : 0;
+        $longitudeuser = isset($lokasiuser[1]) ? $lokasiuser[1] : 0;
+
+        // Hitung jarak
+        $jarak  = $this->distance($latitudekantor, $longitudekantor, $latitudeuser, $longitudeuser);
+        $radius = round($jarak['meters']); // jarak meteran
+
+     // Cek apakah sudah presensi masuk
+        $cek = DB::table('presensi')
+            ->where('tgl_presensi', $tgl_presensi)
+            ->where('nik', $nik)->count();
+    
+        if($cek > 0){
+            $ket = "out";
+        }else{
+            $ket = "in";
+        }
+
+        $image        = $request->image;
+        $folderPath   = 'public/uploads/absensi/';
+        $formatName   = $nik . "-" . $tgl_presensi. "-". $ket;
+        $fileName     = $formatName . ".png";
+        $file         = $folderPath . $fileName;
 
         // Validasi gambar
         if (!$image) {
@@ -52,11 +72,17 @@ class PresensiController extends Controller
         try {
             DB::beginTransaction();
 
-            // Cek apakah sudah presensi masuk
-            $cek = DB::table('presensi')
-                ->where('tgl_presensi', $tgl_presensi)
-                ->where('nik', $nik)
-                ->count();
+            // Jika berada di luar radius
+          if ($radius > 700) { // radius maksimal 40 m
+            DB::rollBack();
+            return response()->json([
+                'status'  => 'fail',
+                'message' => 'fail|Maaf Anda Berada Diluar Radius Kantor|Out'
+            ]);
+        }
+
+
+           
 
             if ($cek > 0) {
                 // Update data pulang
@@ -72,22 +98,21 @@ class PresensiController extends Controller
                     ->update($data_pulang);
 
                 if ($update) {
-                   Storage::put($file, $image_base64);
-                        DB::commit();
-                        return response()->json([
-                            'status'  => 'success',
-                            // kirim pesan pakai | supaya bisa split di JS
-                            'message' => 'success|Terimakasih, Hati-hati di jalan!|Out'
-                        ]);
-                    } else {
-                        DB::rollBack();
-                        return response()->json([
-                            'status'  => 'fail',
-                            'message' => 'fail|Maaf Gagal Absen, Hubungi Tim IT | Out'
-                        ], 500);
+                    Storage::put($file, $image_base64);
+                    DB::commit();
+                    return response()->json([
+                        'status'  => 'success',
+                        'message' => 'success|Terimakasih, Hati-hati di jalan!|Out'
+                    ]);
+                } else {
+                    DB::rollBack();
+                    return response()->json([
+                        'status'  => 'fail',
+                        'message' => 'fail|Maaf Gagal Absen, Hubungi Tim IT|Out'
+                    ], 500);
                 }
-
-            } else {
+            } else 
+            {
                 // Insert data presensi masuk
                 $data_masuk = [
                     'nik'          => $nik,
@@ -101,18 +126,17 @@ class PresensiController extends Controller
 
                 if ($simpan) {
                     Storage::put($file, $image_base64);
-                        DB::commit();
-                        return response()->json([
-                            'status'  => 'success',
-                            // kirim pesan pakai | juga
-                            'message' => 'success|Terimakasih, Selamat Bekerja!|In'
-                        ]);
-                    } else {
-                        DB::rollBack();
-                        return response()->json([
-                            'status'  => 'fail',
-                            'message' => 'fail|Maaf Gagal Absen, Hubungi Tim IT | In'
-                        ], 500);
+                    DB::commit();
+                    return response()->json([
+                        'status'  => 'success',
+                        'message' => 'success|Terimakasih, Selamat Bekerja!|In'
+                    ]);
+                } else {
+                    DB::rollBack();
+                    return response()->json([
+                        'status'  => 'fail',
+                        'message' => 'fail|Maaf Gagal Absen, Hubungi Tim IT|In'
+                    ], 500);
                 }
             }
         } catch (\Exception $e) {
@@ -122,5 +146,19 @@ class PresensiController extends Controller
                 'message' => $e->getMessage()
             ], 500);
         }
+    }
+
+    // Menghitung jarak dalam meter
+    function distance($lat1, $lon1, $lat2, $lon2)
+    {
+        $theta = $lon1 - $lon2;
+        $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +
+                cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
+        $dist = acos(min(max($dist, -1), 1)); // clamp supaya tidak error
+        $dist = rad2deg($dist);
+        $miles = $dist * 60 * 1.1515;
+        $kilometers = $miles * 1.609344;
+        $meters = $kilometers * 1000;
+        return compact('meters');
     }
 }
