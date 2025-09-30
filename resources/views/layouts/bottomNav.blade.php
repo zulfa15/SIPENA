@@ -87,7 +87,7 @@
     </a>
 
     <!-- Akun -->
-    <a href="#" class="item">
+    <a href="/editprofile" class="item">
         <div class="col">
             <img src="https://s3-alpha-sig.figma.com/img/81a0/c748/a42...">
             <strong>Akun</strong>

@@ -14,7 +14,17 @@
 <!-- User Card -->
 <div class="card mt-3 mb-4 shadow-sm">
   <div class="card-body d-flex align-items-center" style="background:#FAC58F; border-radius:12px;">
-    <img src="assets/img/sample/avatar/avatar1.jpg" alt="avatar" class="rounded-circle me-3" width="60" height="60">
+    <div class="avatar">
+      @if (!empty(Auth::guard('karyawan')->user()->foto))
+      @php
+        $path = Storage::url('uploads/karyawan/'.Auth::guard('karyawan')->user()->foto);
+      @endphp
+      <img src="{{ url($path) }}" alt="avatar" class="rounded-circle me-3" width="60" height="60">
+      @else
+      <img src="assets/img/sample/avatar/avatar1.jpg" alt="avatar" class="rounded-circle me-3" width="60" height="60">
+      @endif
+    </div>
+    
     <div>
       <h6 class="mb-0 text-dark">{{ Auth::guard('karyawan')->user()->nama_lengkap }}</h6>
       <small class="text-dark">{{ Auth::guard('karyawan')->user()->jabatan }}</small>
