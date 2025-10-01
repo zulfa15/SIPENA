@@ -118,7 +118,7 @@
         color: 'red',
         fillColor: '#f03',
         fillOpacity: 0.5,
-        radius: 800
+        radius: 1000
     }).addTo(map).bindPopup("Radius Kantor");
 }
 

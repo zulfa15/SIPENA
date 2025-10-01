@@ -76,7 +76,7 @@ class PresensiController extends Controller
             DB::beginTransaction();
 
             // Jika berada di luar radius
-          if ($radius > 700) { // radius maksimal 40 m
+          if ($radius > 1000) { // radius maksimal 40 m
             DB::rollBack();
             return response()->json([
                 'status'  => 'fail',
@@ -212,6 +212,29 @@ class PresensiController extends Controller
             return Redirect::back()->with(['error'=>'Data Gagal di Update']);
         }
         
+    }
+
+    public function histori(){
+        $namabulan = ["","Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+        return view('presensi.histori',compact('namabulan'));
+
+    }
+
+    public function gethistori(Request $request)
+    {
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
+        $nik = Auth::guard('karyawan')->user()->nik;
+
+        $histori = DB::table('presensi')
+        ->whereRAw('MONTH(tgl_presensi)="'.$bulan.'"')
+        ->whereRAw('YEAR(tgl_presensi)="'.$tahun.'"')
+        ->where('nik',$nik)
+        ->orderBy('tgl_presensi')
+        ->get();
+
+        return view('presensi.gethistori',compact('histori'));
+
     }
 
     
