@@ -153,7 +153,7 @@
                             notifikasi_out.load();
                             notifikasi_out.play();
                         }
-
+                        //alert
                         Swal.fire({
                             title: 'Berhasil!',
                             text: parts[1],

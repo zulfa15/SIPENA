@@ -237,5 +237,38 @@ class PresensiController extends Controller
 
     }
 
+
+    public function cuti()
+    {
+        return view('presensi.cuti');
+    }
+
+    public function buatcuti()
+    {
+        return view('presensi.buatcuti');
+    }
+
+     public function storecuti(Request $request)
+    {
+        $nik = Auth::guard('karyawan')->user()->nik;
+        $tgl_cuti = $request->tgl_cuti;
+        $status = $request->status;
+        $keterangan = $request->keterangan;
+
+        $data = [
+            'nik' => $nik,
+            'tgl_cuti' => $tgl_cuti,
+            'status' => $status,
+            'keterangan' => $keterangan,
+        ];
+
+        $simpan = DB::table('pengajuan_cuti')->insert($data);
+
+        if($simpan){
+            return redirect('/presensi/cuti')->with(['success'=>'Data Berhasil Disimpan']);
+        }else {
+            return redirect('/presensi/cuti')->with(['error'=>'Data Gagal Disimpan']);
+        }
+    }
     
 }

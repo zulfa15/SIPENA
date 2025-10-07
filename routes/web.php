@@ -33,4 +33,9 @@ Route::middleware(['auth:karyawan'])->group(function(){
     Route::get('/presensi/histori',[PresensiController::class,'histori']);
     Route::post('/gethistori',[PresensiController::class,'gethistori']);
 
+    //Cuti
+    Route::get('/presensi/cuti',[PresensiController::class,'cuti']);
+    Route::get('/presensi/buatcuti', [PresensiController::class, 'buatcuti']);
+    Route::post('/presensi/storecuti', [PresensiController::class, 'storecuti']);
+
 });
