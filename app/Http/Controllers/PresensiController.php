@@ -240,13 +240,21 @@ class PresensiController extends Controller
 
     public function cuti()
     {
-        return view('presensi.cuti');
+        $nik = Auth::guard('karyawan')->user()->nik;
+        $datacuti = DB::table('pengajuan_cuti')
+            ->where('nik', $nik)
+            ->get();
+
+        // tampilkan daftar cuti
+        return view('presensi.cuti', compact('datacuti'));
     }
 
     public function buatcuti()
     {
+        // tampilkan form buat cuti
         return view('presensi.buatcuti');
     }
+
 
      public function storecuti(Request $request)
     {

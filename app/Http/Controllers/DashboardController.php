@@ -36,6 +36,8 @@ class DashboardController extends Controller
             ->get();
         $namabulan = ["","Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
         
+        $rekapcuti = DB::table('pengajuan_cuti')
+        ->selecRaw('')
         return view('dashboard.dashboard', compact('presensihariini','historibulanini', 'namabulan', 'bulanini', 'tahunini', 'rekappresensi','leaderboard'));
     }
 }
