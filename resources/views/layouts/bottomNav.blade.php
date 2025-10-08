@@ -22,9 +22,18 @@
         text-decoration: none;
     }
 
-    .appBottomMenu .item.active strong {
-        color: #F7A129;
-    }
+    .appBottomMenu .item.active svg,
+.appBottomMenu .item.active strong {
+    color: #f59e0b !important;
+    fill: #f59e0b !important;
+}
+
+.appBottomMenu .item svg,
+.appBottomMenu .item strong {
+    transition: color 0.3s ease, fill 0.3s ease;
+}
+
+
 
     .appBottomMenu .item img {
         width: 26px;
@@ -61,7 +70,7 @@
 
 <div class="appBottomMenu">
     <!-- Home -->
-    <a href="/dashboard" class="item" {{ request()->is('dashboard') ? 'active' : ''  }}>
+    <a href="/dashboard" class="item {{ request()->is('dashboard') ? 'active' : '' }}">
         <div class="col">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M4 19v-9q0-.475.213-.9t.587-.7l6-4.5q.525-.4 1.2-.4t1.2.4l6 4.5q.375.275.588.7T20 10v9q0 .825-.588 1.413T18 21h-3q-.425 0-.712-.288T14 20v-5q0-.425-.288-.712T13 14h-2q-.425 0-.712.288T10 15v5q0 .425-.288.713T9 21H6q-.825 0-1.412-.587T4 19"/>
@@ -71,7 +80,7 @@
     </a>
 
     <!-- Rekap -->
-    <a href="/presensi/histori" class="item">
+    <a href="/presensi/histori" class="item {{ request()->is('presensi/histori') ? 'active' : '' }}">
         <div class="col">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M4.172 3.172C3 4.343 3 6.229 3 10v4c0 3.771 0 5.657 1.172 6.828S7.229 22 11 22h2c3.771 0 5.657 0 6.828-1.172S21 17.771 21 14v-4c0-3.771 0-5.657-1.172-6.828S16.771 2 13 2h-2C7.229 2 5.343 2 4.172 3.172M7.25 8A.75.75 0 0 1 8 7.25h8a.75.75 0 0 1 0 1.5H8A.75.75 0 0 1 7.25 8m0 4a.75.75 0 0 1 .75-.75h8a.75.75 0 0 1 0 1.5H8a.75.75 0 0 1-.75-.75M8 15.25a.75.75 0 0 0 0 1.5h5a.75.75 0 0 0 0-1.5z" clip-rule="evenodd"/></svg>
             <strong>Rekap</strong>
@@ -91,7 +100,7 @@
 
 
     <!-- Cuti -->
-    <a href="/presensi/cuti" class="item">
+    <a href="/presensi/cuti" class="item {{ request()->is('presensi/cuti') ? 'active' : '' }}">
         <div class="col">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M2 19c0 1.7 1.3 3 3 3h14c1.7 0 3-1.3 3-3v-8H2zM19 4h-2V3c0-.6-.4-1-1-1s-1 .4-1 1v1H9V3c0-.6-.4-1-1-1s-1 .4-1 1v1H5C3.3 4 2 5.3 2 7v2h20V7c0-1.7-1.3-3-3-3"/></svg>
             <strong>Cuti</strong>
@@ -99,7 +108,7 @@
     </a>
 
     <!-- Akun -->
-    <a href="/editprofile" class="item">
+    <a href="/editprofile" class="item {{ request()->is('editprofile') ? 'active' : '' }}">
         <div class="col">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M8 7a4 4 0 1 1 8 0a4 4 0 0 1-8 0m0 6a5 5 0 0 0-5 5a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3a5 5 0 0 0-5-5z" clip-rule="evenodd"/></svg>
             <strong>Akun</strong>
@@ -107,3 +116,7 @@
     </a>
 </div>
 <!-- * App Bottom Menu -->
+
+
+
+

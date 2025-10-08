@@ -10,7 +10,7 @@
         background-color: #1B7D7E !important;
     }
 </style>
-<div class="appHeader bg-primary text-light">
+<div class="appHeader bg-primary text-light" style="background-color: #1B7D7E !important;">
     <div class="left">
         <a href="javascript:;" class="headerButton goBack">
             <ion-icon name="chevron-back-outline"></ion-icon>
@@ -40,7 +40,7 @@
                 <textarea name="keterangan" id="keterangan" cols="30" rows="5" class="form-control" placeholder="keterangan"></textarea>
             </div>
             <div class="form-group">
-                <button class="btn btn-primary w-100">Kirim</button>
+                <button class="btn w-100" style="background-color:#F7A129; border-color:#F7A129;">Kirim</button>
             </div>
         </form>
     </div>

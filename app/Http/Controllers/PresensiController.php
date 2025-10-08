@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
+use Carbon\Carbon;
+
 
 class PresensiController extends Controller
 {
@@ -278,5 +280,42 @@ class PresensiController extends Controller
             return redirect('/presensi/cuti')->with(['error'=>'Data Gagal Disimpan']);
         }
     }
+
+private function hitungalpa($nik, $bulan, $tahun)
+{
+    // Ambil tanggal hari ini
+    $today = now();
+
+    // Tentukan rentang tanggal awal bulan sampai hari ini
+    $startDate = Carbon::createFromDate($tahun, $bulan, 1);
+    $endDate = $today;
+
+    // Hitung total hari kerja dari tanggal 1 sampai hari ini (Senin–Jumat)
+    $workdays = 0;
+    $current = $startDate->copy();
+    while ($current->lte($endDate)) {
+        if ($current->isWeekday()) {
+            $workdays++;
+        }
+        $current->addDay();
+    }
+
+    // Hitung total hari yang sudah absen (hadir)
+    // PERBAIKAN: Menggunakan DB::table('presensi') untuk menentukan tabel
+    $hadir = DB::table('presensi')->where('nik', $nik) 
+    ->whereMonth('tgl_presensi', $bulan)
+    ->whereYear('tgl_presensi', $tahun)
+    ->whereDate('tgl_presensi', '<=', $today)
+    ->count();
+
+
+    // Hitung alpa (hari kerja - hadir)
+    $alpa = max($workdays - $hadir, 0);
+
+    return $alpa;
+}
+
+
+
     
 }

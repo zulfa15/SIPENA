@@ -1,6 +1,6 @@
 @extends('layouts.presensi')
 @section('header')
-<div class="appHeader bg-primary text-light">
+<div class="appHeader bg-primary text-light" style="background-color: #1B7D7E !important;">
     <div class="left">
         <a href="javascript:;" class="headerButton goBack">
             <ion-icon name="chevron-back-outline"></ion-icon>
@@ -63,13 +63,14 @@
         </div>
         <div class="form-group boxed">
             <div class="input-wrapper">
-                <button type="submit" class="btn btn-primary btn-block">
+                <button type="submit" class="btn btn-block" 
+                    style="background-color:#F7A129; border-color:#F7A129; color:white;">
                     <ion-icon name="refresh-outline"></ion-icon>
                     Update
                 </button>
             </div>
         </div>
-    </div>
+    </div>
 </form>
 
 @endsection

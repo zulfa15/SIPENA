@@ -88,7 +88,7 @@
         <div class="card-body text-center" style="padding: 12px 12px !important; line-height: 0.8rem">
           <svg xmlns="http://www.w3.org/2000/svg" width="31" height="31" class="text-success" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M3 14v-4c0-3.771 0-5.657 1.172-6.828S7.229 2 11 2h2c3.771 0 5.657 0 6.828 1.172c.654.653.943 1.528 1.07 2.828M21 10v4c0 3.771 0 5.657-1.172 6.828S16.771 22 13 22h-2c-3.771 0-5.657 0-6.828-1.172c-.654-.653-.943-1.528-1.07-2.828M8 14h5m-5-4h1m7 0h-4"/></svg>        
           <br>
-            <span class="badge fw-bold" style="font-size: 0.8rem; font-weight:900">0 Hari</span>
+            <span class="badge fw-bold" style="font-size: 0.8rem; font-weight:900">{{ $rekapcuti->jmlcuti }} Hari</span>
           <br>
             <span style="font-size: 0.7rem; font-weight:500" >Cuti</span>
         </div>
@@ -110,7 +110,7 @@
         <div class="card-body text-center" style="padding: 12px 12px !important; line-height: 0.8rem">
           <svg xmlns="http://www.w3.org/2000/svg" width="31" height="31" class="text-danger" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="6" r="4"/><path d="M15 13.327A13.6 13.6 0 0 0 12 13c-4.418 0-8 2.015-8 4.5S4 22 12 22c5.687 0 7.331-1.018 7.807-2.5"/><circle cx="18" cy="16" r="4"/><path stroke-linecap="round" stroke-linejoin="round" d="m16.667 14.667l2.666 2.666m0-2.666l-2.666 2.666"/></g></svg>       
           <br>
-            <span class="badge fw-bold" style="font-size: 0.8rem; font-weight:900">0 Hari</span>
+            <span class="badge fw-bold" style="font-size: 0.8rem; font-weight:900">{{ $alpa }} Hari</span>
           <br>
             <span style="font-size: 0.7rem; font-weight:500" >Alpa</span>
         </div>
