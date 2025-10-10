@@ -1,8 +1,16 @@
 @extends('layouts.presensi')
 @section(('content'))
 <!-- Header -->
-<div class="header p-3 text-white d-flex justify-content-between align-items-center rounded-bottom" style="background-image: url('/assets/img/login/bacground.png'); background-size: cover; background-position: center;">
-  <div>
+<div 
+    class="header p-3 text-white d-flex justify-content-between align-items-center rounded-bottom" 
+    style="
+        background-image: url('/assets/img/login/bacground.png'); 
+        background-size: cover; 
+        background-position: center;
+        /* PENAMBAHAN UNTUK MEMPERBESAR TINGGI */
+        min-height: 150px; 
+    "
+>  <div>
   
   <h5 class="mb-1" style="font-family: 'Public Sans', sans-serif; font-weight: 800; font-size: 1.2rem; color: #fff;">Selamat Datang di SIPENA</h5>
     <small style="font-family: 'Public Sans', sans-serif; font-weight: 500; font-size: 1rem; color: #fff;">Jangan lupa absen hari ini!</small>
@@ -11,60 +19,82 @@
     <ion-icon name="notifications-outline" size="large"></ion-icon>
   </div>
 </div>
+<br>
+<div style="
+    background-color: #FFFFFF; /* Ganti dengan warna putih jika diperlukan untuk kontras */
+    margin-top: -30px; /* Tarik ke atas agar melengkung di bawah header */
+    border-top-left-radius: 40px; 
+    border-top-right-radius: 40px; 
+    background-color: #EEEEEE; /* Warna background dashboard */
+    padding: 20px 20px 0 20px; /* Padding di sekitar konten */
+    z-index: 1; /* Pastikan berada di atas header yang tidak memiliki z-index tinggi */
+    position: relative; /* Diperlukan agar z-index bekerja */
+">
 
 <!-- User Card -->
-<div class="card mt-3 mb-4 shadow-sm">
-  <div class="card-body d-flex align-items-center" style="background:#FAC58F; border-radius:12px;">
-    <div class="avatar">
-      @if (!empty(Auth::guard('karyawan')->user()->foto))
-      @php
-        $path = Storage::url('uploads/karyawan/'.Auth::guard('karyawan')->user()->foto);
-      @endphp
-      <img src="{{ url($path) }}" alt="avatar" class="rounded-circle me-3" width="60" height="60">
-      @else
-      <img src="assets/img/sample/avatar/avatar1.jpg" alt="avatar" class="rounded-circle me-3" width="60" height="60">
-      @endif
-    </div>
+<div>
+    <div 
+        class="card-body d-flex align-items-center" 
+        style="
+            background: #FAC58F; 
+            padding: 15px;
+            /* Penerapan Lengkungan Sesuai Permintaan */
+            border-top-left-radius: 30px; 
+            border-top-right-radius: 30px;
+            border-bottom-left-radius: 15px; 
+            border-bottom-right-radius: 15px;">
+        <div class="avatar me-3">
+            @if (!empty(Auth::guard('karyawan')->user()->foto))
+            @php
+                $path = Storage::url('uploads/karyawan/'.Auth::guard('karyawan')->user()->foto);
+            @endphp
+            <img src="{{ url($path) }}" alt="avatar" class="rounded-circle" width="60" height="60" style="object-fit: cover;">
+            @else
+            <img src="assets/img/sample/avatar/avatar1.jpg" alt="avatar" class="rounded-circle" width="60" height="60" style="object-fit: cover;">
+            @endif
+        </div>
+        
+        <div style="flex-grow: 1; margin-left: 5px;">
+    <h6 class="mb-0 text-dark" style="font-weight: 500; font-size: 0.9rem;">{{ Auth::guard('karyawan')->user()->nama_lengkap }}</h6>
     
-    <div>
-      <h6 class="mb-0 text-dark">{{ Auth::guard('karyawan')->user()->nama_lengkap }}</h6>
-      <small class="text-dark">{{ Auth::guard('karyawan')->user()->jabatan }}</small>
+    <div style="width: 85%; height: 2px; background-color: #F79F1F; margin-top: 2px; margin-bottom: 5px;"></div>
+    
+    <small class="text-dark" style="font-size: 0.9em;">{{ Auth::guard('karyawan')->user()->jabatan }}</small>
+</div>
     </div>
-  </div>
 </div>
 
 
 <!-- Absensi Card -->
-<h3 style="font-size: 0.9rem; font-weight:500">Presensi Hari Ini</h3>
-<div class="card mt-1 mb-4 shadow-sm">
-  <div class="card-body">
-    <div class="d-flex justify-content-between">
-      <span class="text-muted">Rabu, 3 September 2025</span>
-      <small class="text-muted">Jam Reguler : 07.30 - 16.00</small>
-    </div>
-    <div class="row text-center">
-      <div class="col-6">
-        <div class="p-1 border rounded shadow-sm">
-          <ion-icon name="log-in-outline" size="large"></ion-icon>
-          <h6 class="mt-1">Absensi Masuk</h6>
-          <span>{{ $presensihariini->jam_in ?? '-- : -- : --' }}</span>
-
+ <br>
+<h3 style="font-size: 0.9rem; font-weight:500; ">Presensi Hari Ini</h3>
+<div class="card mt-1 mb-4 shadow-sm" style="border-radius: 15px;">
+    <div class="card-body" style="border-radius: 15px;">
+        <div class="d-flex justify-content-between">
+            <span class="text-muted">Rabu, 3 September 2025</span>
+            <small class="text-muted">Jam Reguler : 07.30 - 16.00</small>
         </div>
-      </div>
-      <div class="col-6">
-        <div class="p-1 border rounded shadow-sm">
-          <ion-icon name="log-out-outline" size="large"></ion-icon>
-          <h6 class="mt-1">Absensi Pulang</h6>
-          <span>
-              {{ $presensihariini && $presensihariini->jam_out
-                  ? date('H:i:s', strtotime($presensihariini->jam_out))
-                  : '-- : -- : --' }}
-          </span>
-
+        <div class="row text-center">
+            <div class="col-6">
+                <div class="p-1 border rounded shadow-sm">
+                    <ion-icon name="log-in-outline" size="large"></ion-icon>
+                    <h6 class="mt-1">Absensi Masuk</h6>
+                    <span>{{ $presensihariini->jam_in ?? '-- : -- : --' }}</span>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="p-1 border rounded shadow-sm">
+                    <ion-icon name="log-out-outline" size="large"></ion-icon>
+                    <h6 class="mt-1">Absensi Pulang</h6>
+                    <span>
+                        {{ $presensihariini && $presensihariini->jam_out
+                            ? date('H:i:s', strtotime($presensihariini->jam_out))
+                            : '-- : -- : --' }}
+                    </span>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>
 
 <!-- Ringkasan Kehadiran -->
@@ -190,6 +220,7 @@
     </div>
   </div>
 </div>
+          
 
 
 
