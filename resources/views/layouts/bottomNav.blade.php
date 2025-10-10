@@ -23,10 +23,10 @@
     }
 
     .appBottomMenu .item.active svg,
-.appBottomMenu .item.active strong {
-    color: #f59e0b !important;
-    fill: #f59e0b !important;
-}
+    .appBottomMenu .item.active strong {
+        color: #f59e0b !important;
+        fill: #f59e0b !important;
+    }
 
 .appBottomMenu .item svg,
 .appBottomMenu .item strong {

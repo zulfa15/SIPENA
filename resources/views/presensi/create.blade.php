@@ -42,7 +42,7 @@
     <div class="row">
         <div class="col">
             @if ($cek > 0)
-                <button id="takeabsen" class="btn btn-danger btn-block">
+                <button id="takeabsen" class="btn btn-danger btn-block" >
                     <ion-icon name="camera-outline"></ion-icon>
                     Absen Pulang
                 </button>

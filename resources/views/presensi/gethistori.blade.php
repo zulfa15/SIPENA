@@ -11,7 +11,6 @@
 </div>
 @endif
 
-@foreach ($histori as $d)
 <ul class="listview">
     @foreach ($histori as $d)
     <li style="padding: 12px 15px; border-bottom: 1px solid #eee;">
@@ -36,11 +35,7 @@
                     {{ $status }}
                 </span>
             </div>
-
-            
         </div>
     </li>
     @endforeach
 </ul>
-
-@endforeach

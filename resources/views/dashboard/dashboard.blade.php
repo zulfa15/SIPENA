@@ -1,10 +1,11 @@
 @extends('layouts.presensi')
 @section(('content'))
 <!-- Header -->
-<div class="header p-3 text-white d-flex justify-content-between align-items-center rounded-bottom" style="background:#1B7D7E;">
+<div class="header p-3 text-white d-flex justify-content-between align-items-center rounded-bottom" style="background-image: url('/assets/img/login/bacground.png'); background-size: cover; background-position: center;">
   <div>
-    <h5 class="mb-1">Selamat Datang di SIPENA</h5>
-    <small>Jangan lupa absen hari ini!</small>
+  
+  <h5 class="mb-1" style="font-family: 'Public Sans', sans-serif; font-weight: 800; font-size: 1.2rem; color: #fff;">Selamat Datang di SIPENA</h5>
+    <small style="font-family: 'Public Sans', sans-serif; font-weight: 500; font-size: 1rem; color: #fff;">Jangan lupa absen hari ini!</small>
   </div>
   <div>
     <ion-icon name="notifications-outline" size="large"></ion-icon>
