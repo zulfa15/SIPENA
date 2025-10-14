@@ -6,15 +6,21 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PresensiController;
 
 
-
-
 Route::middleware(['guest:karyawan'])->group(function(){
     Route::get('/', function () {
         return view('auth.login');
     })->name('login');
 
     Route::post('/proseslogin',[AuthController::class, 'proseslogin']);
+    Route::get('/proseslogin', function () {
+        return redirect('/');
+    });
+});
 
+Route::middleware(['guest:user'])->group(function(){
+    Route::get('/panel', function () {
+        return view('auth.loginadmin');
+    })->name('loginadmin');
 });
 
 Route::middleware(['auth:karyawan'])->group(function(){

@@ -305,7 +305,8 @@ private function hitungalpa($nik, $bulan, $tahun)
     $hadir = DB::table('presensi')->where('nik', $nik) 
     ->whereMonth('tgl_presensi', $bulan)
     ->whereYear('tgl_presensi', $tahun)
-    ->whereDate('tgl_presensi', '<=', $today)
+    ->whereDate('tgl_presensi', '<=', Carbon::createFromDate($tahun, $bulan, 1)->endOfMonth())
+
     ->count();
 
 

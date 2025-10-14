@@ -62,7 +62,7 @@ class DashboardController extends Controller
 
         // Hitung jumlah alpa (hari kerja tanpa kehadiran, izin, atau sakit)
         $alpa = $harikerja - ($rekappresensi->jmlhadir + $rekapcuti->jmlcuti);
-        if ($alpa < 0) {
+        if ($alpa < 1) {
             $alpa = 0; // biar gak minus kalau datanya gak seimbang
         }
 

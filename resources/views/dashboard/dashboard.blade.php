@@ -19,7 +19,7 @@
     <ion-icon name="notifications-outline" size="large"></ion-icon>
   </div>
 </div>
-<br>
+
 <div style="
     background-color: #FFFFFF; /* Ganti dengan warna putih jika diperlukan untuk kontras */
     margin-top: -30px; /* Tarik ke atas agar melengkung di bawah header */

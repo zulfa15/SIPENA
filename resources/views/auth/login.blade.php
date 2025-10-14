@@ -19,8 +19,8 @@
       background-color: #1B7D7E;
       text-align: center;
       padding: 60px 20px 80px;
-      border-bottom-left-radius: 40px;
-      border-bottom-right-radius: 40px;
+      border-bottom-left-radius: 0px;
+      border-bottom-right-radius: 00px;
       position: relative;
     }
 
@@ -103,30 +103,50 @@
     <h1>SIPENA</h1>
   </div>
 
+  <div style="
+    background-color: #FFFFFF; /* Ganti dengan warna putih jika diperlukan untuk kontras */
+    margin-top: -30px; /* Tarik ke atas agar melengkung di bawah header */
+    border-top-left-radius: 30px; 
+    border-top-right-radius: 30px; 
+    background-color: #EEEEEE; /* Warna background dashboard */
+    padding: 20px 20px 0 20px; /* Padding di sekitar konten */
+    z-index: 1; /* Pastikan berada di atas header yang tidak memiliki z-index tinggi */
+    position: relative; /* Diperlukan agar z-index bekerja */
+">
+  <br>
+  <br>
+  <br>
   <div class="login-container">
-    <h2>Masuk ke akunmu</h2>
-    @php
-    $messagewarning = Session::get('warning');
-    @endphp
-    @if (Session::get('warning'))
-    <div class="alert-outline-warning">
-        {{ $messagewarning }}
+      <h2>Masuk ke akunmu</h2>
+      @php
+      $messagewarning = Session::get('warning');
+      @endphp
+      @if (Session::get('warning'))
+      <div class="alert-outline-warning">
+          {{ $messagewarning }}
+      </div>
+      @endif
+      <form action="/proseslogin" method="POST">
+          @csrf
+        <div class="form-group">
+          <input type="text" name="nik" class="form-control" id="nik" placeholder="NIK">
+        </div>
+        <div class="form-group">
+          <input type="password" name='password' class="form-control" id="password" placeholder="Password">
+        </div>
+        <div class="form-links">
+          <a href="#">Lupa Password</a>
+        </div>
+        <button type="submit" class="btn-login">Masuk</button>
+      </form>
     </div>
-    @endif
-    <form action="/proseslogin" method="POST">
-        @csrf
-      <div class="form-group">
-        <input type="text" name="nik" class="form-control" id="nik" placeholder="NIK">
-      </div>
-      <div class="form-group">
-        <input type="password" name='password' class="form-control" id="password" placeholder="Password">
-      </div>
-      <div class="form-links">
-        <a href="#">Lupa Password</a>
-      </div>
-      <button type="submit" class="btn-login">Masuk</button>
-    </form>
-  </div>
-</body>
+  </body>
+
+</div>
+
+
+
+
+  
 
 </html>
