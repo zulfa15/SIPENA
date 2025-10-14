@@ -45,3 +45,6 @@ Route::middleware(['auth:karyawan'])->group(function(){
     Route::post('/presensi/storecuti', [PresensiController::class, 'storecuti']);
 
 });
+
+
+Route::get('/dashboardadmin',[DashboardController::class, 'dashboardadmin']);
