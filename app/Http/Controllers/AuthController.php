@@ -13,7 +13,8 @@ class AuthController extends Controller
         if(Auth::guard('karyawan')->attempt(['nik'=> $request->nik,'password'=>$request->password])){
             return redirect('/dashboard');
         }else{
-            return redirect('/')->with((['warning'=>'Nik / Password Salah']));
+            return redirect('/')->with('warning', 'Nik / Password Salah');
+
         }
 
    }
@@ -23,6 +24,29 @@ class AuthController extends Controller
             return redirect('/');
         }
    }
+
+
+   public function proseslogoutadmin()
+   {
+        if(Auth::guard('user')->check()){
+            Auth::guard('user')->logout();
+            return redirect('/panel');
+        }
+   }
+
+    public function prosesloginadmin(request $request)
+   {
+        if(Auth::guard('user')->attempt(['email'=> $request->email,'password'=>$request->password])){
+            return redirect('/panel/dashboardadmin');
+        }else{
+           
+            return redirect('/panel')->with('warning', 'Username / Password Salah');
+
+        }
+        
+
+   }
+
 }
 
 
