@@ -72,8 +72,34 @@ class DashboardController extends Controller
         'bulanini', 'tahunini', 'rekappresensi','leaderboard','rekapcuti','alpa'));
     }
 
-    public function dashboardadmin(){
-        return view('dashboard.dashboardadmin');
+    public function dashboardadmin() {
+        $hariini = date("Y-m-d");
+
+        // Hitung jumlah hadir dan terlambat hari ini
+        $rekappresensi = DB::table('presensi')
+            ->selectRaw('COUNT(nik) as jmlhadir, SUM(IF(jam_in > "07:30",1,0)) as jmlterlambat')
+            ->where('tgl_presensi', $hariini)
+            ->first();
+
+        // Hitung jumlah cuti/izin/sakit hari ini (yang disetujui)
+        $rekapcuti = DB::table('pengajuan_cuti')
+            ->selectRaw('SUM(IF(status="i" OR status="s", 1, 0)) as jmlcuti')
+            ->where('tgl_cuti', $hariini)
+            ->where('status_approved', 1)
+            ->first();
+
+        // Hitung total karyawan
+        $totalkaryawan = DB::table('karyawan')->count();
+
+        // Hitung jumlah alpa = total karyawan - (hadir + cuti/izin/sakit)
+        $alpa = $totalkaryawan - (($rekappresensi->jmlhadir ?? 0) + ($rekapcuti->jmlcuti ?? 0));
+        if ($alpa < 0) {
+            $alpa = 0; // biar gak minus
+        }
+
+        return view('dashboard.dashboardadmin', compact('rekappresensi', 'rekapcuti', 'totalkaryawan', 'alpa'));
     }
+
+
 
 }
