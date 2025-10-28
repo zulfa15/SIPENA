@@ -45,7 +45,7 @@
                       </div>
                       <div class="col">
                         <div class="font-weight-medium">
-                            {{ $rekappresensi->jmlhadir == null ? $rekapcuti->jmlcuti : 0 }}
+                            {{ $rekappresensi->jmlhadir = null ? $rekapcuti->jmlcuti : 0 }}
                         </div>
                         <div class="text-secondary">Karyawan</div>
                         <div class="text-secondary">Hadir</div>
