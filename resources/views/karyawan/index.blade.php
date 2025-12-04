@@ -95,7 +95,51 @@
                                         @endif
                                     </td>
                                     
-                                    <td></td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+
+                                            <!-- Tombol Edit -->
+                                            <a href="#" 
+                                            class="edit btn btn-info btn-sm d-flex justify-content-center align-items-center" 
+                                            style="width: 36px; height: 36px;"
+                                            nik="{{ $d->nik }}">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" 
+                                                    viewBox="0 0 24 24">
+                                                    <g fill="none" stroke="currentColor" stroke-linecap="round" 
+                                                    stroke-linejoin="round" stroke-width="2">
+                                                        <path d="m16.475 5.408l2.117 2.117m-.756-3.982L12.109 9.27a2.1 
+                                                        2.1 0 0 0-.58 1.082L11 13l2.648-.53c.41-.082.786-.283 
+                                                        1.082-.579l5.727-5.727a1.853 1.853 0 1 0-2.621-2.621"/>
+                                                        <path d="M19 15v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 
+                                                        1 2-2h3"/>
+                                                    </g>
+                                                </svg>
+                                            </a>
+
+                                            <!-- Tombol Delete -->
+                                            <form action="/karyawan/{{ $d->nik }}/delete" method="POST">
+                                                @csrf
+                                                
+                                                <a 
+                                                    class="btn btn-danger btn-sm d-flex justify-content-center align-items-center delete-confirm"
+                                                    style="width: 36px; height: 36px;" >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" 
+                                                        viewBox="0 0 16 16">
+                                                        <path fill="currentColor" 
+                                                            d="M11 1.75V3h2.25a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 
+                                                            1 0-1.5H5V1.75C5 .784 5.784 0 6.75 0h2.5C10.216 0 11 
+                                                            .784 11 1.75M4.496 6.675l.66 6.6a.25.25 0 0 0 .249.225h5.19a.25.25 
+                                                            0 0 0 .249-.225l.65-6.6a.75.75 0 0 1 1.492.149l-.66 6.6A1.75 
+                                                            1.75 0 0 1 10.595 15h-5.19a1.75 1.75 0 0 1-1.741-1.575l-.66-6.6a.75.75 
+                                                            0 1 1 1.492-.15M6.5 1.75V3h3V1.75a.25.25 0 0 0-.25-.25h-2.5a.25.25 
+                                                            0 0 0-.25.25"/>
+                                                    </svg>
+                                                </a>
+                                            </form>
+
+                                        </div>
+                                    </td>
+
                                     </tr>
                                 @endforeach
                                 </tbody>
@@ -111,6 +155,22 @@
             </div>
         </div>
     </div>
+</div>
+{{-- Modal Edit --}}
+<div class="modal modal-blur fade" id="modal-editkaryawan" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Data Karyawan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="loadeditform">
+                
+            </div>
+            
+        </div>
+    </div>
+
 </div>
 
 <div class="modal modal-blur fade" id="modal-inputkaryawan" tabindex="-1" role="dialog" aria-hidden="true">
@@ -192,6 +252,45 @@
     $(function(){
         $("#btnTambahkaryawan").click(function(){
             $("#modal-inputkaryawan").modal("show");
+        });
+
+        $(".edit").click(function(){
+            var nik = $(this).attr('nik');
+            $.ajax({
+                type:'POST',
+                url:'/karyawan/edit',
+                cache:false,
+                data:{
+                    _token: "{{ csrf_token() }}"
+                    , nik: nik
+                },
+                success:function(respond){
+                    $("#loadeditform").html(respond);
+                }
+            });
+            $("#modal-editkaryawan").modal("show");
+        });
+
+        $(".delete-confirm").click(function(e){
+            var form = $(this).closest('form');
+            e.preventDefault();
+            Swal.fire({
+            title: "Apakah Anda Yakin Data Ini Mau di Hapus?",
+            text: "Jika Ya Maka Data Akan Terhapus Permanent",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Hapus"
+            }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                title: "Deleted!",
+                text: "Data Berhasil Di Hapus",
+                icon: "success"
+                });
+            }
+            });
         });
 
         $("#frmKaryawan").submit(function(){
