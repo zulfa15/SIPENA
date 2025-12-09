@@ -316,7 +316,19 @@ private function hitungalpa($nik, $bulan, $tahun)
     return $alpa;
 }
 
+public function monitoring(){
+    return view('presensi.monitoring');
+}
 
+public function getpresensi(Request $request){
+    $tanggal = $request->tanggal;
+    $presensi = DB::table('presensi')
+    ->select('presensi.*','nama_lengkap',)
+    ->join('karyawan','presensi.nik','=','karyawan.nik')
+    ->where('tgl_presensi',$tanggal)
+    ->get();
 
+    return view('presensi.getpresensi', compact('presensi'));
+}
     
 }
