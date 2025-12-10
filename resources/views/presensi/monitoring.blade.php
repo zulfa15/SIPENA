@@ -1,5 +1,7 @@
 @extends('layouts.admin.tabler')
 @section('content')
+
+
 <div class="page-header d-print-none">
     <div class="container-xl">
         <div class="row g-2 align-items-center">
@@ -24,7 +26,7 @@
                                         <!-- Download SVG icon from http://tabler-icons.io/i/user -->
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M19 4h-2V3a1 1 0 0 0-2 0v1H9V3a1 1 0 0 0-2 0v1H5a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3m1 15a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-7h16Zm0-9H4V7a1 1 0 0 1 1-1h2v1a1 1 0 0 0 2 0V6h6v1a1 1 0 0 0 2 0V6h2a1 1 0 0 1 1 1Z"/></svg>
                                     </span>
-                                    <input type="text" id="tanggal" name="tanggal" value="" class="form-control" placeholder="Tanggal Presensi" autocomplete="off">
+                                    <input type="text" id="tanggal" value="{{ date("Y-m-d") }}" name="tanggal" value="" class="form-control" placeholder="Tanggal Presensi" autocomplete="off">
                                 </div>
                             </div>
                         </div>
@@ -64,9 +66,8 @@
             , todayHighlight: true
             , format: 'yyyy-mm-dd'
         });
-
-        $("#tanggal").change(function(e){
-            var tanggal = $(this).val();
+        function loadpresensi(){
+             var tanggal = $("#tanggal").val();
             $.ajax({
                 type:'POST',
                 url:'/getpresensi',
@@ -79,7 +80,12 @@
                     $("#loadpresensi").html(respond);
                 }
             })
+        }
+        $("#tanggal").change(function(e){
+           loadpresensi();
         });
+
+        loadpresensi();
     });
 </script>
 @endpush
