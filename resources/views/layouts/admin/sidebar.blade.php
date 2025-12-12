@@ -178,6 +178,28 @@
                   </span>
                 </a>
               </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#navbar-base" data-bs-toggle="dropdown" data-bs-auto-close="false" role="button" aria-expanded="false" >
+                  <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/package -->
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"><defs><mask id="SVGa0DOTdgy"><g fill="none" stroke="#fff" stroke-linejoin="round" stroke-width="4"><path fill="#555555" d="M32 6H22v36h10zm10 0H32v36h10zM10 6l8 1l-3.5 35L6 41z"/><path stroke-linecap="round" d="M37 18v-3m-10 3v-3"/></g></mask></defs><path fill="currentColor" d="M0 0h48v48H0z" mask="url(#SVGa0DOTdgy)"/></svg>                  
+                  </span>
+                  <span class="nav-link-title">
+                    Laporan
+                  </span>
+                </a>
+                <div class="dropdown-menu">
+                  <div class="dropdown-menu-columns">
+                    <div class="dropdown-menu-column">
+                      <a class="dropdown-item" href="/presensi/laporan">
+                        Presensi
+                      </a>
+                      <a class="dropdown-item" href="/karyawan">
+                        Rekap Karyawan
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </li>
             </ul>
           </div>
         </div>
