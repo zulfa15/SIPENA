@@ -2,173 +2,218 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>A4</title>
+    <title>Laporan Presensi Karyawan</title>
 
-    <!-- Normalize or reset CSS with your favorite library -->
+    <!-- Normalize -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css">
 
-    <!-- Load paper.css for happy printing -->
+    <!-- Paper CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paper-css/0.4.1/paper.css">
 
-    <!-- Set page size here: A5, A4 or A3 -->
-    <!-- Set also "landscape" if you need -->
     <style>
-    @page { 
-        size: A4 
+        @page {
+            size: A4;
+            margin: 20mm;
         }
-        h3{
-            font-family:Arial, Helvetica, sans-serif;
+
+        body.A4 {
+            background: #f0f0f0;
+        }
+
+        .sheet {
+            border: 1.5px solid #000;
+            padding: 20px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        h3 {
+            margin: 4px 0;
             font-size: 18px;
             font-weight: bold;
         }
-        .tabeldatakaryawan{
-            margin-top: 40px;
 
+        .tabeldatakaryawan {
+            margin-top: 30px;
+            font-size: 13px;
         }
 
-        .tabledatakaryawan td {
-            padding: 5px;
+        .tabeldatakaryawan td {
+            padding: 4px;
         }
 
-        .tabelpresensi{
+        .tabelpresensi {
             width: 100%;
-            margin-top: 20px;
-            font-family:Arial, Helvetica, sans-serif;
+            margin-top: 25px;
             border-collapse: collapse;
-        }
-
-        .tabelpresensi tr th{
-            border: 1px solid #000;
-            padding: 8px;
-            background: #d4d4d4ff;
-        }
-         .tabelpresensi tr td{
-            border: 1px solid #000;
-            padding: 8px;
             font-size: 12px;
         }
 
-        .foto{
-            width: 40px ;
+        .tabelpresensi th {
+            border: 1px solid #000;
+            padding: 8px;
+            background: #d4d4d4;
+            text-align: center;
+        }
+
+        .tabelpresensi td {
+            border: 1px solid #000;
+            padding: 6px;
+            line-height: 1.4;
+            text-align: center;
+        }
+
+        .foto {
+            width: 40px;
             height: 30px;
         }
     </style>
 </head>
 
-<!-- Set "A5", "A4" or "A3" for class name -->
-<!-- Set also "landscape" if you need -->
 <body class="A4">
 
-    <!-- Each sheet element should have the class "sheet" -->
-    <!-- "padding" is optional: you can set 10, 15, 20 or 25 -->
-    <section class="sheet padding-10">
+@php
+function selisih($jam_masuk, $jam_keluar)
+{
+    if (is_null($jam_keluar)) return '0:00';
 
-        <!-- Write HTML just like a web page -->
-        <table style="width: 100%; border-bottom: 2px solid #000; padding-bottom: 10px; font-family: Arial, Helvetica, sans-serif;">
-            <tr>
-                <td style="width: 100px; text-align: center; vertical-align: top;">
-                    <img src="{{ asset('assets/img/logo sementara.png') }}" 
-                        alt="Logo" 
-                        width="90"
-                        style="display: block; margin: 0 auto;">
-                </td>
+    list($h, $m, $s) = explode(":", $jam_masuk);
+    $awal = mktime($h, $m, $s, 0, 0, 0);
 
-                <td style="text-align: center;">
-                    <h3 style="margin: 5px 0 0 0; font-size: 18px; font-family: Arial, Helvetica, sans-serif;">
-                        LAPORAN PRESENSI KARYAWAN
-                    </h3>
+    list($h, $m, $s) = explode(":", $jam_keluar);
+    $akhir = mktime($h, $m, $s, 0, 0, 0);
 
-                    <h3 style="margin: 5px 0 0 0; font-size: 18px; font-family: Arial, Helvetica, sans-serif;">
-                        PERIODE {{ strtoupper($namabulan[$bulan]) }} {{ $tahun }}
-                    </h3>
+    $selisih = $akhir - $awal;
+    $menit = $selisih / 60;
 
-                    <h3 style="margin: 5px 0 10px 0; font-size: 18px; font-family: Arial, Helvetica, sans-serif;">
-                        DINAS KOMUNIKASI DAN INFORMATIKA KAB. KARANGANYAR
-                    </h3>
+    $jam = floor($menit / 60);
+    $sisaMenit = round($menit % 60);
 
-                    <div style="font-size: 12px; color: #555; font-family: Arial, Helvetica, sans-serif;">
-                        <i>No. 385 B, Jl. Lawu, Badran Asri, Cangakan, Karanganyar, Jawa Tengah 57715</i>
-                    </div>
-                </td>
-            </tr>
-        </table>
-        <table class="tabeldatakaryawan" >
-            <tr>
-                <td rowspan="5">
-                    @php
-                        $path = Storage::url('uploads/karyawan/'.$karyawan->foto);
-                    @endphp
-                    <img src="{{ url($path) }}" alt="" width="100px" height="120px">
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <td>NIK</td>
-                    <td>:</td>
-                    <td>{{ $karyawan->nik }}</td>
-                </td>
-            </tr>
-            <tr>    
-                <td>
-                    <td>Nama Karyawan</td>
-                    <td>:</td>
-                    <td>{{ $karyawan->nama_lengkap }}</td>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <td>Jabatan</td>
-                    <td>:</td>
-                    <td>{{ $karyawan->jabatan }}</td>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <td>No. HP</td>
-                    <td>:</td>
-                    <td>{{ $karyawan->no_hp }}</td>
-                </td>
-            </tr>
-        </table>
-        <table class="tabelpresensi">
-            <tr>
-                <th>No.</th>
-                <th>Tanggal</th>
-                <th>Jam Masuk</th>
-                <th>Foto</th>
-                <th>Jam Pulang</th>
-                <th>Foto</th>
-                <th>Keterangan</th>
-            </tr>
-            <tr>
-                @foreach ($presensi as $d)
-                @php
-                    $path_in = Storage::url('uploads/absensi/'.$d->foto_in);
-                    $path_out = Storage::url('uploads/absensi/'.$d->foto_out);
+    return $jam . ":" . str_pad($sisaMenit, 2, '0', STR_PAD_LEFT);
+}
+@endphp
 
-                @endphp
-                    <tr>
-                        <td>{{ $loop->iteration }}</td>
-                        <td>{{ date("d-m-Y",strtotime($d->tgl_presensi)) }}</td>
-                        <td>{{ $d->jam_in }}</td>
-                        <td><img src="{{ url($path_in) }}" alt="" class="foto"></td>
-                        <td>{{ $d->jam_out = null ? $d->jam_out : 'Belum Absen' }}</td>
-                        <td><img src="{{ url($path_out) }}" alt="" class="foto"></td>
-                        <td>
-                            @if ($d->jam_in > '07:30:00')
-                                Terlambat
-                                @else
-                                Tepat Waktu
-                            @endif
-                        </td>
-                    </tr>
-                @endforeach
-            </tr>
-        </table>
+<section class="sheet">
 
+    <!-- HEADER -->
+    <table width="100%" style="border-bottom:2px solid #000; padding-bottom:10px;">
+        <tr>
+            <td width="100" align="center">
+                <img src="{{ asset('assets/img/logo sementara.png') }}" width="90">
+            </td>
+            <td align="center">
+                <h3>LAPORAN PRESENSI KARYAWAN</h3>
+                <h3>PERIODE {{ strtoupper($namabulan[$bulan]) }} {{ $tahun }}</h3>
+                <h3>DINAS KOMUNIKASI DAN INFORMATIKA KAB. KARANGANYAR</h3>
+                <div style="font-size:12px;color:#555">
+                    <i>No. 385 B, Jl. Lawu, Karanganyar, Jawa Tengah 57715</i>
+                </div>
+            </td>
+        </tr>
+    </table>
 
+    <!-- DATA KARYAWAN -->
+    <table class="tabeldatakaryawan">
+        <tr>
+            <td rowspan="4" width="120">
+                @php $path = Storage::url('uploads/karyawan/'.$karyawan->foto); @endphp
+                <img src="{{ url($path) }}" width="110" height="130">
+            </td>
+            <td width="150">NIK</td>
+            <td width="10">:</td>
+            <td>{{ $karyawan->nik }}</td>
+        </tr>
+        <tr>
+            <td>Nama Karyawan</td>
+            <td>:</td>
+            <td>{{ $karyawan->nama_lengkap }}</td>
+        </tr>
+        <tr>
+            <td>Jabatan</td>
+            <td>:</td>
+            <td>{{ $karyawan->jabatan }}</td>
+        </tr>
+        <tr>
+            <td>No. HP</td>
+            <td>:</td>
+            <td>{{ $karyawan->no_hp }}</td>
+        </tr>
+    </table>
 
-    </section>
+    <!-- TABEL PRESENSI -->
+    <table class="tabelpresensi">
+        <tr>
+            <th>No</th>
+            <th>Tanggal</th>
+            <th>Jam Masuk</th>
+            <th>Foto</th>
+            <th>Jam Pulang</th>
+            <th>Foto</th>
+            <th>Keterangan</th>
+            <th>Jml Jam</th>
+        </tr>
+
+        @foreach ($presensi as $d)
+        @php
+            $path_in  = Storage::url('uploads/absensi/'.$d->foto_in);
+            $path_out = Storage::url('uploads/absensi/'.$d->foto_out);
+            $jamterlambat = selisih('07:30:00', $d->jam_in);
+            $jmljamkerja = selisih($d->jam_in, $d->jam_out);
+        @endphp
+        <tr>
+            <td>{{ $loop->iteration }}</td>
+            <td>{{ date('d-m-Y', strtotime($d->tgl_presensi)) }}</td>
+            <td>{{ $d->jam_in }}</td>
+            <td><img src="{{ url($path_in) }}" class="foto"></td>
+            <td>{{ is_null($d->jam_out) ? 'Belum Absen' : $d->jam_out }}</td>
+            <td>
+                @if (!is_null($d->jam_out))
+                    <img src="{{ url($path_out) }}" class="foto">
+                @else
+                    -
+                @endif
+            </td>
+            <td>
+                @if ($d->jam_in > '07:30:00')
+                    Terlambat {{ $jamterlambat }}
+                @else
+                    Tepat Waktu
+                @endif
+            </td>
+            <td>{{ $jmljamkerja }}</td>
+        </tr>
+        @endforeach
+    </table>
+
+    <!-- TANDA TANGAN -->
+    <table width="100%" style="margin-top:80px;">
+        <tr>
+            <td colspan="2" align="right">
+                Karanganyar, {{ date('d-m-Y') }}
+            </td>
+        </tr>
+        <tr>
+            <td align="center" height="200">
+                <b>HRD Manager</b>
+                <br>
+                <br>
+                <br>
+                <br>
+                <u>Nama Lengkap HRD</u>
+                
+            </td>
+            <td align="center">
+                <b>Direktur</b>
+                <br>
+                <br>
+                <br>
+                <br>
+                <u>Nama Lengkap Direktur</u>
+                
+            </td>
+        </tr>
+    </table>
+
+</section>
 
 </body>
 </html>

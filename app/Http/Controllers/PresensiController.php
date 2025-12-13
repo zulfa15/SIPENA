@@ -356,6 +356,7 @@ public function cetaklaporan(Request $request){
     ->where('nik',$nik)
     ->whereRaw('MONTH(tgl_presensi)="'.$bulan.'"')
     ->whereRaw('YEAR(tgl_presensi)="'.$tahun.'"')
+    ->orderBy('tgl_presensi', )
     ->get();
     return view('presensi.cetaklaporan', compact('bulan','tahun','namabulan','karyawan', 'presensi'));
 }
