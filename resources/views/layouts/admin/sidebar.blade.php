@@ -193,7 +193,7 @@
                       <a class="dropdown-item" href="/presensi/laporan">
                         Presensi
                       </a>
-                      <a class="dropdown-item" href="/karyawan">
+                      <a class="dropdown-item" href="/karyawan/rekap">
                         Rekap Karyawan
                       </a>
                     </div>
