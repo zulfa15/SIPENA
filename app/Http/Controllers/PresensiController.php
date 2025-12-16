@@ -18,10 +18,21 @@ class PresensiController extends Controller
     {
         $hariini = date("Y-m-d");
         $nik = Auth::guard('karyawan')->user()->nik;
-        $cek = DB::table('presensi')->where('tgl_presensi', $hariini)->where('nik', $nik)->count();
 
-        return view('presensi.create', compact('cek'));
+        $cek = DB::table('presensi')
+            ->where('tgl_presensi', $hariini)
+            ->where('nik', $nik)
+            ->count();
+
+        $konfigurasi = DB::table('konfigurasi_lokasi')->where('id', 1)->first();
+
+        return view('presensi.create', [
+            'cek'           => $cek,
+            'lokasi_kantor' => $konfigurasi->lokasi_kantor, // "-7.xxx,110.xxx"
+            'radius'        => $konfigurasi->radius         // angka
+        ]);
     }
+
 
     public function store(Request $request)
     {

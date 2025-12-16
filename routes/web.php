@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PresensiController;
 use App\Http\Controllers\KaryawanController;
+use App\Http\Controllers\KonfigurasiController;
 
 
 Route::middleware(['guest:karyawan'])->group(function(){
@@ -65,7 +66,7 @@ Route::middleware(['auth:user'])->group(function()
     Route::post('/karyawan/{nik}/delete',[KaryawanController::class,'delete']);
 
     //presensi
-    Route::get('/presensi/monitoring',[PresensiController::class,'monitoring']);
+    Route::get('/presensi/monitoring',action: [PresensiController::class,'monitoring']);
     Route::post('/getpresensi',[PresensiController::class,'getpresensi']);
     Route::post('/tampilkanpeta',[PresensiController::class,'tampilkanpeta']);
     Route::get('/presensi/laporan',[PresensiController::class,'laporan']);
@@ -73,6 +74,9 @@ Route::middleware(['auth:user'])->group(function()
     Route::get('/karyawan/rekap',[PresensiController::class,'rekap']);
     Route::post('/karyawan/cetakrekap',[PresensiController::class,'cetakrekap']);
 
+    // Konfigurasi
+    Route::get('/konfigurasi/lokasikantor', [KonfigurasiController::class,'lokasikantor']);
+    Route::post('/konfigurasi/updatelokasikantor', [KonfigurasiController::class,'updatelokasikantor']);
 
 });
 

@@ -77,13 +77,17 @@
     var notifikasi_in  = document.getElementById('notifikasi_in');
     var notifikasi_out = document.getElementById('notifikasi_out');
     var radius_sound   = document.getElementById('radius_sound');
+    const lokasiInput  = document.getElementById('lokasi');
 
-    // ==== KOORDINAT KANTOR (ubah sesuai lokasi kantor) ====
-    const latKantor = -7.595928021196008; // ganti latitude kantor
-    const lngKantor = 110.94004006560145; // ganti longitude kantor (benar)
-    const radiusKantor = 20; // meter
+    // ==== KONFIGURASI LOKASI DARI DATABASE ====
+    var lokasi_kantor = "{{ $lokasi_kantor }}"; // "-7.xxx,110.xxx"
+    var radiusKantor  = "{{ $radius }}";          // meter
 
+    var lok = lokasi_kantor.split(",");
+    var latKantor = parseFloat(lok[0]);
+    var lngKantor = parseFloat(lok[1]);
 
+    // ==== WEBCAM ====
     Webcam.set({
         height: 480,
         width: 640,
@@ -91,45 +95,51 @@
         jpeg_quality: 80
     });
     Webcam.attach('.webcam-capture');
-  const lokasiInput = document.getElementById('lokasi');
 
+    // ==== GEOLOCATION ====
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
     } else {
-        lokasiInput.value = "Geolocation tidak didukung browser ini";
+        lokasiInput.value = "Geolocation tidak didukung browser";
     }
 
     function successCallback(position) {
-    const latUser = position.coords.latitude;
-    const lngUser = position.coords.longitude;
-    lokasiInput.value = latUser + "," + lngUser;
+        const latUser = position.coords.latitude;
+        const lngUser = position.coords.longitude;
 
-    var map = L.map('map').setView([position.coords.latitude, position.coords.longitude], 15);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; OpenStreetMap'
-    }).addTo(map);
+        lokasiInput.value = latUser + "," + lngUser;
 
-    // Marker posisi user/device
-    var marker = L.marker([position.coords.latitude, position.coords.longitude]).addTo(map);
+        // ==== MAP ====
+        var map = L.map('map').setView([latUser, lngUser], 18);
 
-    // Circle radius kantor (tetap di pusat kantor)
-    L.circle([latKantor, lngKantor], {
-        color: 'red',
-        fillColor: '#f03',
-        fillOpacity: 0.5,
-        radius: 1000
-    }).addTo(map).bindPopup("Radius Kantor");
-}
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
 
+        // Marker USER
+        L.marker([latUser, lngUser])
+            .addTo(map)
+            .bindPopup("Posisi Anda")
+            .openPopup();
 
-    function errorCallback(error) {
-        lokasiInput.value = "Tidak bisa mendapatkan lokasi: " + error.message;
+        // Circle KANTOR (dari database)
+        L.circle([latKantor, lngKantor], {
+            color: 'red',
+            fillColor: '#f03',
+            fillOpacity: 0.5,
+            radius: radiusKantor
+        }).addTo(map).bindPopup("Radius Kantor");
     }
 
+    function errorCallback(error) {
+        lokasiInput.value = "Gagal mendapatkan lokasi: " + error.message;
+    }
+
+    // ==== ABSEN ====
     $("#takeabsen").click(function () {
         Webcam.snap(function (uri) {
-            let image = uri;
+            let image  = uri;
             let lokasi = $('#lokasi').val();
 
             $.ajax({
@@ -145,44 +155,37 @@
                     let parts = respond.message.split('|');
 
                     if (respond.status === 'success') {
-                        // Berhasil (notifikasi_in = absen masuk, notifikasi_out = absen pulang)
+
                         if (parts[2] && parts[2].toLowerCase() === "in") {
-                            notifikasi_in.load();
                             notifikasi_in.play();
                         } else {
-                            notifikasi_out.load();
                             notifikasi_out.play();
                         }
-                        //alert
+
                         Swal.fire({
                             title: 'Berhasil!',
                             text: parts[1],
-                            icon: 'success',
-                            confirmButtonText: 'OK'
+                            icon: 'success'
                         });
 
-                        setTimeout(function () {
+                        setTimeout(() => {
                             window.location.href = '/dashboard';
                         }, 3000);
 
                     } else {
-                        // Diluar radius
-                        radius_sound.load();
                         radius_sound.play();
 
                         Swal.fire({
                             title: 'Gagal!',
                             text: parts[1],
-                            icon: 'error',
-                            confirmButtonText: 'OK'
+                            icon: 'error'
                         });
                     }
                 },
-                error: function (xhr) {
-                    console.log(xhr.responseText);
+                error: function () {
                     Swal.fire({
                         title: 'Error!',
-                        text: 'Terjadi kesalahan sistem!',
+                        text: 'Terjadi kesalahan sistem',
                         icon: 'error'
                     });
                 }
@@ -191,3 +194,4 @@
     });
 </script>
 @endpush
+
