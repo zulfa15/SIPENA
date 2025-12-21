@@ -1,197 +1,224 @@
 @extends('layouts.presensi')
 
 @section('header')
-    <!-- App Header -->
-    <div class="appHeader bg-primary text-light" style="background-color: #1B7D7E !important;">
-        <div class="left">
-            <a href="javascript:;" class="headerButton goBack">
-                <ion-icon name="chevron-back-outline"></ion-icon>
-            </a>
-        </div>
-        <div class="pageTitle">E-Presensi</div>
-        <div class="right"></div>
+<div class="appHeader bg-primary text-light" style="background-color:#1B7D7E!important">
+    <div class="left">
+        <a href="javascript:;" class="headerButton goBack">
+            <ion-icon name="chevron-back-outline"></ion-icon>
+        </a>
     </div>
-    <!-- * App Header -->
- <style>
-        .webcam-capture,
-        .webcam-capture video {
-            display: inline-block;
-            width: 100% !important;
-            margin: auto;
-            height: auto !important;
-            border-radius: 15px;
-        }
+    <div class="pageTitle">E-Presensi</div>
+</div>
 
-        #map {
-            height: 200px;
-        }
-    </style>
+<style>
+.webcam-capture, .webcam-capture video {
+    width:100%!important;
+    border-radius:15px;
+}
+#map { height:200px; }
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+.overlay {
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.6);
+    z-index:9999;
+}
+.overlay-box {
+    background:#fff;
+    padding:20px;
+    margin:30% auto;
+    width:90%;
+    max-width:380px;
+    border-radius:16px;
+}
+</style>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 @endsection
 
 @section('content')
-    <div class="row" style="margin-top: 70px">
-        <div class="col">
-            <input type="hidden" id="lokasi" class="form-control mb-3" placeholder="Koordinat lokasi">
-            <div class="webcam-capture"></div>
-        </div>
+<div class="row" style="margin-top:70px">
+    <div class="col">
+        <input type="hidden" id="lokasi">
+        <div class="webcam-capture"></div>
     </div>
-    
-    <div class="row">
-        <div class="col">
-            @if ($cek > 0)
-                <button id="takeabsen" class="btn btn-danger btn-block" >
-                    <ion-icon name="camera-outline"></ion-icon>
-                    Absen Pulang
-                </button>
-            @else
-                <button id="takeabsen" class="btn btn-primary btn-block">
-                    <ion-icon name="camera-outline"></ion-icon>
-                    Absen Masuk
-                </button>
-            @endif
-        </div>
-    </div>
+</div>
 
-    <div class="row mt-2">
-        <div class="col">
-            <div id="map"></div>
+<div class="row mt-2">
+    <div class="col">
+        <button id="takeabsen" class="btn btn-primary btn-block">
+            <ion-icon name="camera-outline"></ion-icon> Absen
+        </button>
+    </div>
+</div>
+
+<div class="row mt-2">
+    <div class="col">
+        <div id="map"></div>
+    </div>
+</div>
+
+<!-- 🔴 OVERLAY DINAS -->
+<div id="overlayDinas" class="overlay">
+    <div class="overlay-box">
+        <h4>Absen di Luar Radius</h4>
+
+        <select id="jenis_dinas" class="form-control mb-2">
+            <option value="">-- Pilih Jenis Dinas --</option>
+            <option value="DLDD">DLDD - Dinas Luar Dalam Daerah</option>
+            <option value="DL">DL - Dinas Luar</option>
+            <option value="TK">TK - Tugas Khusus</option>
+        </select>
+
+        <textarea id="keterangan" class="form-control mb-3"
+            placeholder="Keterangan tugas"></textarea>
+
+        <div class="text-end">
+            <button class="btn btn-secondary" onclick="tutupOverlay()">Batal</button>
+            <button class="btn btn-primary" onclick="kirimDinas()">Kirim</button>
         </div>
     </div>
+</div>
 
-    <audio id="notifikasi_in">
-        <source src="{{ asset('assets/sound/notifikasi_in.mp3') }}" type="audio/mpeg">
-    </audio>
-    <audio id="notifikasi_out">
-        <source src="{{ asset('assets/sound/notifikasi_out.mp3') }}" type="audio/mpeg">
-    </audio>
-    <audio id="radius_sound">
-        <source src="{{ asset('assets/sound/radius.mp3') }}" type="audio/mpeg">
-    </audio>
+<!-- 🟢 OVERLAY BERHASIL -->
+<div id="overlayBerhasil" class="overlay">
+    <div class="overlay-box text-center">
+        <ion-icon name="checkmark-circle"
+            style="font-size:64px;color:#4CAF50"></ion-icon>
+        <h4 class="mt-2">Absen Diajukan</h4>
+        <p class="text-muted">
+            Pengajuan dinas luar berhasil dikirim
+        </p>
+        <button class="btn btn-primary btn-block" onclick="keDashboard()">OK</button>
+    </div>
+</div>
 @endsection
 
 @push('myscript')
 <script>
-    var notifikasi_in  = document.getElementById('notifikasi_in');
-    var notifikasi_out = document.getElementById('notifikasi_out');
-    var radius_sound   = document.getElementById('radius_sound');
-    const lokasiInput  = document.getElementById('lokasi');
+const lokasiInput = document.getElementById('lokasi');
+var lokasi_kantor = "{{ $lokasi_kantor }}";
+var radiusKantor  = "{{ $radius }}";
 
-    // ==== KONFIGURASI LOKASI DARI DATABASE ====
-    var lokasi_kantor = "{{ $lokasi_kantor }}"; // "-7.xxx,110.xxx"
-    var radiusKantor  = "{{ $radius }}";          // meter
+let imageBase64 = null;
 
-    var lok = lokasi_kantor.split(",");
-    var latKantor = parseFloat(lok[0]);
-    var lngKantor = parseFloat(lok[1]);
+/* ================= WEBCAM ================= */
+Webcam.set({
+    width:640,
+    height:480,
+    image_format:'jpeg',
+    jpeg_quality:80
+});
+Webcam.attach('.webcam-capture');
 
-    // ==== WEBCAM ====
-    Webcam.set({
-        height: 480,
-        width: 640,
-        image_format: 'jpeg',
-        jpeg_quality: 80
-    });
-    Webcam.attach('.webcam-capture');
+/* ================= GEOLOCATION ================= */
+navigator.geolocation.getCurrentPosition(pos => {
+    let lat = pos.coords.latitude;
+    let lng = pos.coords.longitude;
+    lokasiInput.value = lat+','+lng;
 
-    // ==== GEOLOCATION ====
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
-    } else {
-        lokasiInput.value = "Geolocation tidak didukung browser";
-    }
+    let map = L.map('map').setView([lat,lng],18);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    L.marker([lat,lng]).addTo(map).bindPopup('Posisi Anda').openPopup();
 
-    function successCallback(position) {
-        const latUser = position.coords.latitude;
-        const lngUser = position.coords.longitude;
+    let kantor = lokasi_kantor.split(',');
+    L.circle([kantor[0],kantor[1]], {
+        radius: radiusKantor,
+        color:'red'
+    }).addTo(map);
+});
 
-        lokasiInput.value = latUser + "," + lngUser;
+/* ================= STATUS ABSEN ================= */
+let sudahAbsenMasuk = {{ $cek > 0 ? 'true' : 'false' }};
 
-        // ==== MAP ====
-        var map = L.map('map').setView([latUser, lngUser], 18);
+/* UBAH TOMBOL JIKA ABSEN PULANG */
+if (sudahAbsenMasuk) {
+    $('#takeabsen')
+        .removeClass('btn-primary')
+        .addClass('btn-danger')
+        .html('<ion-icon name="log-out-outline"></ion-icon> Absen Pulang');
+}
 
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; OpenStreetMap'
-        }).addTo(map);
+/* ================= ABSEN ================= */
+$('#takeabsen').click(function(){
+    Webcam.snap(uri => {
 
-        // Marker USER
-        L.marker([latUser, lngUser])
-            .addTo(map)
-            .bindPopup("Posisi Anda")
-            .openPopup();
+        imageBase64 = uri;
 
-        // Circle KANTOR (dari database)
-        L.circle([latKantor, lngKantor], {
-            color: 'red',
-            fillColor: '#f03',
-            fillOpacity: 0.5,
-            radius: radiusKantor
-        }).addTo(map).bindPopup("Radius Kantor");
-    }
+        $.post('/presensi/store',{
+            _token:'{{ csrf_token() }}',
+            image: uri,
+            lokasi: $('#lokasi').val()
+        }, res => {
 
-    function errorCallback(error) {
-        lokasiInput.value = "Gagal mendapatkan lokasi: " + error.message;
-    }
+            /* MASUK + LUAR RADIUS */
+            if(res.status === 'outside'){
+                $('#overlayDinas').fadeIn();
+            }
 
-    // ==== ABSEN ====
-    $("#takeabsen").click(function () {
-        Webcam.snap(function (uri) {
-            let image  = uri;
-            let lokasi = $('#lokasi').val();
+            /* BERHASIL (MASUK / PULANG) */
+            else if(res.status === 'success'){
+                Swal.fire('Berhasil', res.message, 'success');
+                setTimeout(()=>location.href='/dashboard',2000);
+            }
 
-            $.ajax({
-                type: 'POST',
-                url: '/presensi/store',
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    image: image,
-                    lokasi: lokasi
-                },
-                cache: false,
-                success: function (respond) {
-                    let parts = respond.message.split('|');
+            /* ERROR */
+            else{
+                Swal.fire('Gagal', res.message, 'error');
+            }
 
-                    if (respond.status === 'success') {
-
-                        if (parts[2] && parts[2].toLowerCase() === "in") {
-                            notifikasi_in.play();
-                        } else {
-                            notifikasi_out.play();
-                        }
-
-                        Swal.fire({
-                            title: 'Berhasil!',
-                            text: parts[1],
-                            icon: 'success'
-                        });
-
-                        setTimeout(() => {
-                            window.location.href = '/dashboard';
-                        }, 3000);
-
-                    } else {
-                        radius_sound.play();
-
-                        Swal.fire({
-                            title: 'Gagal!',
-                            text: parts[1],
-                            icon: 'error'
-                        });
-                    }
-                },
-                error: function () {
-                    Swal.fire({
-                        title: 'Error!',
-                        text: 'Terjadi kesalahan sistem',
-                        icon: 'error'
-                    });
-                }
-            });
         });
     });
+});
+
+/* ================= KIRIM DINAS (KHUSUS MASUK) ================= */
+function kirimDinas() {
+    let jenis  = $('#jenis_dinas').val();
+    let ket    = $('#keterangan').val();
+    let lokasi = $('#lokasi').val();
+
+    if (!jenis || !ket || !imageBase64) {
+        Swal.fire('Peringatan', 'Lengkapi data dan ambil foto', 'warning');
+        return;
+    }
+
+    let formData = new FormData();
+    formData.append('_token', "{{ csrf_token() }}");
+    formData.append('jenis_dinas', jenis);
+    formData.append('keterangan', ket);
+    formData.append('lokasi', lokasi);
+    formData.append('foto', imageBase64);
+
+    $.ajax({
+        type: 'POST',
+        url: '/presensi/luar-radius',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (res) {
+            if (res.status === 'success') {
+                $('#overlayDinas').hide();
+                $('#overlayBerhasil').fadeIn();
+            } else {
+                Swal.fire('Gagal', res.message, 'error');
+            }
+        },
+        error: function (xhr) {
+            $('#overlayDinas').hide();
+            Swal.fire(
+                'Gagal',
+                xhr.responseJSON?.message ?? 'Server error',
+                'error'
+            );
+        }
+    });
+}
+
+/* ================= NAVIGASI ================= */
+function keDashboard(){
+    location.href='/dashboard';
+}
 </script>
 @endpush
-

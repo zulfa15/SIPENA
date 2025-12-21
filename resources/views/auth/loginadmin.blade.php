@@ -85,9 +85,7 @@
               </div>
             </div>
           </div>
-          <div class="col-lg d-none d-lg-block">
-            <img src="{{ asset('tabler/static/illustrations/undraw_secure_login_pdn4.svg') }}" height="300" class="d-block mx-auto" alt="">
-          </div>
+          
         </div>
       </div>
     </div>
