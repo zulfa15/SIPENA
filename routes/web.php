@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PresensiController;
 use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\KonfigurasiController;
+use App\Http\Controllers\DinasLuarController;
 
 /*
 |--------------------------------------------------------------------------
@@ -82,18 +83,27 @@ Route::middleware(['auth:user'])->group(function(){
     Route::post('/presensi/batalkanizinsakit',[PresensiController::class,'batalkanizinsakit']);
 
     // ✅ DINAS LUAR (ADMIN)
-    Route::get('/admin/dinas-luar',[PresensiController::class,'dinasLuar']);
-    Route::post('/admin/dinas-luar/approve',[PresensiController::class,'approveDinasLuar']);
+    Route::get('/presensi/dinasluar', [DinasLuarController::class, 'dinasluar']);
+    Route::post('/presensi/dinasluar/approve', [DinasLuarController::class, 'approve']);
 
     // KONFIGURASI
     Route::get('/konfigurasi/lokasikantor',[KonfigurasiController::class,'lokasikantor']);
     Route::post('/konfigurasi/updatelokasikantor',[KonfigurasiController::class,'updatelokasikantor']);
-});
 
-Route::middleware(['auth:admin'])->group(function () {
+    Route::post('/tampilkanpeta', [PresensiController::class, 'tampilkanPeta']);
 
-    Route::get('/admin/dinas-luar', [PresensiController::class, 'adminDinasLuar']);
-    Route::post('/admin/dinas-luar/approve', [PresensiController::class, 'approveDinasLuar']);
+    // ================= LAPORAN PRESENSI =================
+    Route::get('/presensi/laporan', [PresensiController::class, 'laporan']);
+    Route::post('/presensi/cetaklaporan', [PresensiController::class, 'cetaklaporan']);
+
+    // ================= REKAP PRESENSI =================
+    Route::get('/presensi/rekap', [PresensiController::class, 'rekap']);
+    Route::post('/presensi/cetakrekap', [PresensiController::class, 'cetakrekap']);
+
     
-
+    
+    
 });
+
+
+    

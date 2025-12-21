@@ -24,17 +24,46 @@
                 Jam Pulang : {{ $d->jam_out ?? '-' }}
             </div>
 
-            {{-- Bagian kanan: Status Hadir / Terlambat --}}
-            <div>
-                @php
-                    $status = $d->jam_in < "07:30" ? 'Hadir' : 'Terlambat';
-                    $badgeClass = $d->jam_in < "07:30" ? 'background: #00796b;' : 'background: #fb8c00;';
-                @endphp
+            {{-- Bagian kanan: Status --}}
+<div>
+    @php
+        // DEFAULT
+        $status = '';
+        $badgeClass = '';
 
-                <span style="padding: 6px 15px; border-radius: 20px; color: #fff; font-size: 14px; {{ $badgeClass }}">
-                    {{ $status }}
-                </span>
-            </div>
+        // JIKA LUAR RADIUS
+        if (!empty($d->keterangan)) {
+            if ($d->keterangan == 'dldd') {
+                $status = 'DLDD';
+                $badgeClass = 'background:#6a1b9a;';
+            } elseif ($d->keterangan == 'dl') {
+                $status = 'DL';
+                $badgeClass = 'background:#1565c0;';
+            } elseif ($d->keterangan == 'tk') {
+                $status = 'TK';
+                $badgeClass = 'background:#2e7d32;';
+            } else {
+                $status = 'Luar Radius';
+                $badgeClass = 'background:#616161;';
+            }
+
+        // JIKA DALAM RADIUS
+        } else {
+            if ($d->jam_in > '07:30:00') {
+                $status = 'Terlambat';
+                $badgeClass = 'background:#fb8c00;';
+            } else {
+                $status = 'Hadir';
+                $badgeClass = 'background:#00796b;';
+            }
+        }
+    @endphp
+
+    <span style="padding:6px 15px;border-radius:20px;color:#fff;font-size:14px;{{ $badgeClass }}">
+        {{ $status }}
+    </span>
+</div>
+
         </div>
     </li>
     @endforeach

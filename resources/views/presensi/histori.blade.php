@@ -60,6 +60,7 @@
 </div>
 <div class="row">
     <div class="col" id="showhistori"></div>
+    
 </div>
 @endsection
 

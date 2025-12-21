@@ -22,7 +22,8 @@
                     
 
                     <div class="card-body">
-                        <form action="/karyawan/cetakrekap" target="_blank" method="POST">
+                        <form action="/presensi/cetakrekap" target="_blank" method="POST">
+                            
                             @csrf
 
                             <div class="row mt-2">

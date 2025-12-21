@@ -244,6 +244,7 @@ class PresensiController extends Controller
         return view('presensi.histori',compact('namabulan'));
 
     }
+    
 
     public function gethistori(Request $request)
     {
@@ -343,24 +344,40 @@ public function monitoring(){
     return view('presensi.monitoring');
 }
 
-public function getpresensi(Request $request){
+public function getPresensi(Request $request){
     $tanggal = $request->tanggal;
+
     $presensi = DB::table('presensi')
-    ->select('presensi.*','nama_lengkap',)
-    ->join('karyawan','presensi.nik','=','karyawan.nik')
-    ->where('tgl_presensi',$tanggal)
-    ->get();
+        ->join('karyawan','presensi.nik','=','karyawan.nik')
+        ->select('presensi.*','karyawan.nama_lengkap','karyawan.jabatan')
+        ->where('tgl_presensi',$tanggal)
+        ->get();
 
     return view('presensi.getpresensi', compact('presensi'));
 }
 
-public function tampilkanpeta(Request $request){
-    $id = $request->id;
-    $presensi = DB::table('presensi')->where('id',$id)
-    ->join('karyawan','presensi.nik', '=', 'karyawan.nik')
-    ->first();
-    return view('presensi.showmap', compact('presensi'));
+
+public function tampilkanPeta(Request $request)
+{
+    $presensi = DB::table('presensi')
+        ->join('karyawan','presensi.nik','=','karyawan.nik')
+        ->select(
+            'presensi.*',
+            'karyawan.nama_lengkap',
+            'karyawan.jabatan',
+            'presensi.lokasi_in'
+        )
+        ->where('presensi.id', $request->id)
+        ->first();
+
+    if (!$presensi) {
+        return 'Data tidak ditemukan';
+    }
+
+    return view('presensi.map', compact('presensi'));
 }
+
+
 
 public function laporan(){
     $namabulan = ["","Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
@@ -571,16 +588,10 @@ public function cetakrekap(Request $request)
         
     
         /* ================= FOLDER (INI KUNCI ERROR KAMU) ================= */
-        $folderPath = public_path('uploads/absensi');
-    
-        // kalau folder belum ada → buat
-        if (!file_exists($folderPath)) {
-            mkdir($folderPath, 0777, true);
-        }
-    
-        $path = $folderPath . '/' . $namaFoto;
-    
-        file_put_contents($path, $fotoBase64);
+        $folderPath = 'public/uploads/absensi/';
+
+        Storage::put($folderPath.$namaFoto, $fotoBase64);
+
     
         /* ================= INSERT PRESENSI ================= */
         DB::table('presensi')->insert([
@@ -654,7 +665,6 @@ public function approveDinasLuar(Request $request)
 
     return back()->with('success','Berhasil memperbarui status');
 }
-
 
 
 
